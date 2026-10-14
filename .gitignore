@@ -1,0 +1,10 @@
+# WorkBuddy 项目记忆 / 工作目录（本地数据，不入库）
+.workbuddy/
+
+# Visual Studio / WDK 构建产物（本仓库只收源码，编译在 PC09 上做）
+x64/
+Debug/
+Release/
+.vs/
+*.user
+*.suo
