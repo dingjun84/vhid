@@ -1,0 +1,62 @@
+; vhidlab.inf — 安装 VhidLab 虚拟 HID 源驱动（root 枚举软件设备）。
+; VHF 要求把 vhf 声明为本驱动的 LowerFilter。测试签名环境使用。
+[Version]
+Signature   = "$WINDOWS NT$"
+Class       = System
+ClassGuid   = {4d36e97d-e325-11ce-bfc1-08002be10318}
+Provider    = %ProviderName%
+DriverVer   = 01/01/2026,1.0.0.0
+CatalogFile = vhidlab.cat
+PnpLockdown = 1
+
+[DestinationDirs]
+DefaultDestDir = 13 ; driver store
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+[SourceDisksFiles]
+vhidlab.sys = 1,,
+
+[Manufacturer]
+%ManufacturerName% = Standard,NT$ARCH$.10.0...16299
+
+[Standard.NT$ARCH$.10.0...16299]
+%DeviceDesc% = VhidLab_Device, root\vhidlab
+
+[VhidLab_Device.NT]
+CopyFiles = VhidLab_CopyFiles
+
+[VhidLab_Device.NT.HW]
+AddReg = VhidLab_AddReg_HW
+
+; 关键：把系统自带的 vhf.sys 挂成本驱动的下层过滤
+[VhidLab_AddReg_HW]
+HKR,,"LowerFilters",0x00010000,"vhf"
+
+[VhidLab_CopyFiles]
+vhidlab.sys
+
+[VhidLab_Device.NT.Services]
+AddService = vhidlab,0x00000002,VhidLab_Service
+AddService = vhf,,Vhf_Service_Inst   ; VERIFY: 系统 vhf 服务是否需显式声明
+
+[VhidLab_Service]
+DisplayName   = %ServiceDesc%
+ServiceType   = 1
+StartType     = 3
+ErrorControl  = 1
+ServiceBinary = %13%\vhidlab.sys
+
+[Vhf_Service_Inst]
+DisplayName   = "Microsoft Virtual HID Framework (VHF)"
+ServiceType   = 1
+StartType     = 3
+ErrorControl  = 1
+ServiceBinary = %12%\vhf.sys
+
+[Strings]
+ProviderName     = "VhidLab"
+ManufacturerName = "VhidLab Research"
+DiskName         = "VhidLab Install Disk"
+DeviceDesc       = "VhidLab Virtual HID Mouse/Keyboard"
+ServiceDesc      = "VhidLab Virtual HID Source Driver"
